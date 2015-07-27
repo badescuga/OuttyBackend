@@ -9,6 +9,7 @@
 "dependencies": {
   "express": "*",
   "socket.io": "*",
-  "azure-storage": "*"
+  "azure-storage": "*",
+  "babel":"*"
 }
 }
