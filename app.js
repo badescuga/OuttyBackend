@@ -5,7 +5,8 @@ var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
-var handler = require('./js/handler.js');
+import * as handler from './js/handler.js';
+
 
 var port = process.env.PORT || 3000;
 
@@ -29,23 +30,27 @@ io.on('connection', function (socket) {
   //   console.log('am primit init de la client.');
   //   socket.emit('init', {});
   // });
-  
+
    socket.on('login', (data, callback) => {
+     handler.loginUser(data,()=>{
+
+       callback();
+     });
     console.log('am primit login de la client. '+ JSON.stringify(data));
     callback(data);
   });
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
+
+
+
+
+
+
   ////////////////////////test data
   // when the client emits 'new message', this listens and executes
   socket.on('new message', function (data) {
