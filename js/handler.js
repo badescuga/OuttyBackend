@@ -8,6 +8,18 @@ async function loginUser(data, callback) {
 
 };
 
+async function createGroup(data, callback) {
+
+};
+
+async function getGroup(data, callback) {
+
+};
+
+async function getGroupMessages(data, callback) {
+
+};
+
 
 module.exports = {
 	loginUser: loginUser
