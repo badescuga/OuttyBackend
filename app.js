@@ -21,6 +21,7 @@ app.use(express.static(__dirname + '/public'));
 
 // usernames which are currently connected to the chat
 var usernames = {};
+var connectedUsers = {};
 var numUsers = 0;
 
 io.on('connection', function (socket) {
@@ -31,15 +32,32 @@ io.on('connection', function (socket) {
   //   socket.emit('init', {});
   // });
 
-   socket.on('login', (data, callback) => {
-     handler.loginUser(data,()=>{
+  socket.on('login', async (data, callback) => {
+    var error = null;
+    var response = null;
+    console.log('am primit login de la client. ' + JSON.stringify(data));
 
-       callback();
-     });
-    console.log('am primit login de la client. '+ JSON.stringify(data));
-    callback(data);
+    try {
+      // login/create user 
+      response = await handler.loginUserAsync(data);
+      connectedUsers[socket.id] = socket;
+      
+      // subscribing user to rooms(groups)
+      var groups = await handler.getGroupsAsync(data);
+     
+    }
+    catch (ex) {
+      error = ex;
+      console.error('error logging user in ' + JSON.stringify(error));
+    }
+
+    callback(error, response);
   });
 
+  socket.on('disconnect', function () {
+    console.log('disconnected socket: ' + socket.id);
+    delete connectedUsers[socket.id];
+  });
 
 
 

@@ -1,26 +1,44 @@
 //var db = require('./db.js');
 import * as  db from './db'
-import * as  testAsync from './testStorageAsync'
+import * as  GUID from './GUID.js'
+//import * as  testAsync from './testStorageAsync'
 
-console.log(` test:  ${ db.tt } ` +db.tt);
-
-async function loginUser(data, callback) {
-
+async function loginUserAsync(data) {
+	try {
+		return await db.loginUserAsync(data);
+	} catch (error) {
+		throw error;
+	}
 };
 
-async function createGroup(data, callback) {
-
+async function createGroupAsync(data) {
+	try {
+		return await db.createGroupAsync(data);
+	} catch (error) {
+		throw error;
+	}
 };
 
-async function getGroup(data, callback) {
-
+async function getGroupsAsync(data) {
+	try {
+		return await db.getGroupsAsync(data);
+	} catch (error) {
+		throw error;
+	}
 };
 
-async function getGroupMessages(data, callback) {
-
+async function getGroupMessagesAsync(data) {
+	try {
+		return await db.getGroupMessagesAsync(data);
+	} catch (error) {
+		throw error;
+	}
 };
 
 
 module.exports = {
-	loginUser: loginUser
+	loginUserAsync: loginUserAsync,
+	createGroupAsync: createGroupAsync,
+	getGroupsAsync: getGroupsAsync,
+	getGroupMessagesAsync: getGroupMessagesAsync
 };
