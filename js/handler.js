@@ -5,7 +5,7 @@ import * as  GUID from './GUID.js'
 
 async function loginUserAsync(data) {
 	try {
-		return await db.loginUserAsync(data);
+		return await db.loginUserAsync(data.fbId, data.fbName, data.fbPhotoPath);
 	} catch (error) {
 		throw error;
 	}
