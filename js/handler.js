@@ -35,10 +35,30 @@ async function getGroupMessagesAsync(data) {
 	}
 };
 
+async function addUserToGroupAsync(data) {
+	try {
+		return await db.addUserToGroupAsync(data.groupId, data.userId);
+	}
+	catch (error) {
+		throw error;
+	}
+}
+
+async function addGroupMessageAsync(data) {
+	try {
+		return await db.addGroupMessageAsync(data.userId, data.groupId, data.message, data.messageType);
+	}
+	catch (error) {
+		throw error;
+	}
+}
+
 
 module.exports = {
 	loginUserAsync: loginUserAsync,
 	createGroupAsync: createGroupAsync,
 	getGroupsAsync: getGroupsAsync,
-	getGroupMessagesAsync: getGroupMessagesAsync
+	getGroupMessagesAsync: getGroupMessagesAsync,
+	addUserToGroupAsync:addUserToGroupAsync,
+	addGroupMessageAsync: addGroupMessageAsync
 };

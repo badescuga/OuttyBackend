@@ -88,7 +88,7 @@ async function createGroupAsync(name) {
 };
 
 
-async function addUserToGroup(groupId, userId) {
+async function addUserToGroupAsync(groupId, userId) {
 
     var newGroupUserObj = {
         PartitionKey: entityGen.String(groupId),
@@ -184,5 +184,7 @@ module.exports = {
     loginUserAsync: loginUserAsync,
     createGroupAsync: createGroupAsync,
     getGroupsAsync: getGroupsAsync,
-    getGroupMessagesAsync: getGroupMessagesAsync
+    getGroupMessagesAsync: getGroupMessagesAsync,
+    addUserToGroupAsync:addUserToGroupAsync,
+    addGroupMessageAsync:addGroupMessageAsync
 };
