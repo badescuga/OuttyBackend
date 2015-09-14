@@ -95,7 +95,7 @@ io.on('connection', function (socket) {
     callback(error, response);
   });
 
-   socket.on('addGroupMessage', async(data, callback) => { // data should contain the groupId,message,messageType
+  socket.on('addGroupMessage', async(data, callback) => { // data should contain the groupId,message,messageType
     var error = null;
     var response = null;
     console.log('am primit join group de la client. ' + JSON.stringify(data));
@@ -109,6 +109,21 @@ io.on('connection', function (socket) {
     }catch(ex) {
       error = ex;
     }
+    callback(error, response);
+  });
+
+  socket.on('getGroupMessages', async(data, callback) => { // data should contain the groupId
+    var error = null;
+    var response = null;
+    console.log('am primit get group messages de la client. ' + JSON.stringify(data));
+    try{
+      response = await handler.getGroupMessagesAsync(data);
+      console.log('1111111111133333 '+JSON.stringify(response));
+    }
+    catch(ex) {
+      error = ex;
+    }
+
     callback(error, response);
   });
 
