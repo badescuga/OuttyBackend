@@ -40,14 +40,6 @@ async function getGroupMessagesAsync(data) {
 	}
 };
 
-async function sendGroupMessageAsync(data) {
-	try {
-		return await db.getGroupMessagesAsync(data.groupId);
-	} catch (error) {
-		throw error;
-	}
-};
-
 async function addUserToGroupAsync(data) {
 	try {
 		return await db.addUserToGroupAsync(data.groupId, data.userId);
