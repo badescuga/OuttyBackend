@@ -32,25 +32,83 @@ io.on('connection', function (socket) {
   //   socket.emit('init', {});
   // });
 
-  socket.on('login', async (data, callback) => {
+  socket.on('login', async(data, callback) => {
     var error = null;
     var response = null;
     console.log('am primit login de la client. ' + JSON.stringify(data));
 
     try {
-      // login/create user 
+      // login/create user
       response = await handler.loginUserAsync(data);
-      connectedUsers[socket.id] = socket;
-      
+      connectedUsers[socket.id] = response;
+
+      console.log('received response from login: ' + JSON.stringify(response));
+
       // subscribing user to rooms(groups)
-      var groups = await handler.getGroupsAsync(data);
-     
+      var groups = await handler.getGroupsAsync(response);
+      groups = groups.entries;
+      groups.forEach(function (item) {
+        console.log('joining room: ' + item.PartitionKey._);
+        socket.join(item.PartitionKey._);
+      });
     }
     catch (ex) {
-      error = ex;
+      var error = ex;
       console.error('error logging user in ' + JSON.stringify(error));
     }
 
+    callback(error, response);
+  });
+
+  socket.on('createGroup', async(data, callback) => { // data should contain only the name of the group
+    var error = null;
+    var response = null;
+    console.log('am primit create group de la client. ' + JSON.stringify(data));
+    try {
+      data.userId = connectedUsers[socket.id].userId;
+      response = await handler.createGroupAsync(data);
+      console.log('responding to client with: ' + JSON.stringify(response));
+
+      //subscribe to the chat
+      socket.join(response.groupId);
+    }catch(ex) {
+      error = ex;
+    }
+    callback(error, response);
+  });
+
+  socket.on('joinGroup', async(data, callback) => { // data should contain only the groupId
+    var error = null;
+    var response = null;
+    console.log('am primit join group de la client. ' + JSON.stringify(data));
+    try{
+      data.userId = connectedUsers[socket.id].userId;
+      response = await handler.addUserToGroupAsync(data);
+      console.log('responding to client with: ' + JSON.stringify(response));
+
+      //subscribe to the chat
+      socket.join(response.groupId);
+
+    }catch(ex) {
+      error = ex;
+    }
+    callback(error, response);
+  });
+
+   socket.on('addGroupMessage', async(data, callback) => { // data should contain the groupId,message,messageType
+    var error = null;
+    var response = null;
+    console.log('am primit join group de la client. ' + JSON.stringify(data));
+    try{
+      data.userId = connectedUsers[socket.id].userId;
+      var response = await handler.addGroupMessageAsync(data);
+
+      //send message to room
+      io.to(data.groupId).emit('receivedMessage', data);
+
+    }catch(ex) {
+      error = ex;
+    }
     callback(error, response);
   });
 

@@ -13,7 +13,12 @@ async function loginUserAsync(data) {
 
 async function createGroupAsync(data) {
 	try {
-		return await db.createGroupAsync(data);
+		var userId = data.userId;
+		var result = await db.createGroupAsync(data.name);
+		await db.addUserToGroupAsync(result.groupId, userId);
+
+		return result;
+
 	} catch (error) {
 		throw error;
 	}
@@ -21,7 +26,7 @@ async function createGroupAsync(data) {
 
 async function getGroupsAsync(data) {
 	try {
-		return await db.getGroupsAsync(data);
+		return await db.getGroupsAsync(data.userId);
 	} catch (error) {
 		throw error;
 	}
@@ -29,7 +34,15 @@ async function getGroupsAsync(data) {
 
 async function getGroupMessagesAsync(data) {
 	try {
-		return await db.getGroupMessagesAsync(data);
+		return await db.getGroupMessagesAsync(data.groupId);
+	} catch (error) {
+		throw error;
+	}
+};
+
+async function sendGroupMessageAsync(data) {
+	try {
+		return await db.getGroupMessagesAsync(data.groupId);
 	} catch (error) {
 		throw error;
 	}
@@ -59,6 +72,6 @@ module.exports = {
 	createGroupAsync: createGroupAsync,
 	getGroupsAsync: getGroupsAsync,
 	getGroupMessagesAsync: getGroupMessagesAsync,
-	addUserToGroupAsync:addUserToGroupAsync,
+	addUserToGroupAsync: addUserToGroupAsync,
 	addGroupMessageAsync: addGroupMessageAsync
 };

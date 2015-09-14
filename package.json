@@ -10,6 +10,7 @@
   "express": "*",
   "socket.io": "*",
   "azure-storage": "*",
-  "babel":"*"
+  "babel":"*",
+  "underscore":"*"
 }
 }
