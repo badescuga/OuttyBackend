@@ -130,7 +130,7 @@ async function addUserToGroupAsync(groupId, userId) {
     });
 };
 
-async function getGroupsAsync(userId) {
+async function getGroupsAsync(userId) { // doesn't return the name of the group
 
     var query = new azure.TableQuery()
     //.top(5);
@@ -141,7 +141,7 @@ async function getGroupsAsync(userId) {
         tableService.queryEntities(GROUPS_MEMBERS_TABLE_NAME, query, null, function (error, result, response) {
             if (!error) {
                 // query succesful
-                // console.log(`get groups query succesful, awesome! result: ${ JSON.stringify(result) } \n response ${ JSON.stringify(response) }`);
+                console.log(`get groups query succesful, awesome! result: ${ JSON.stringify(result) } \n response ${ JSON.stringify(response) }`);
                 resolve(result);
             } else {
                 console.log(`get groups query failed: ${error}`);

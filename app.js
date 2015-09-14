@@ -46,6 +46,7 @@ io.on('connection', function (socket) {
 
       // subscribing user to rooms(groups)
       var groups = await handler.getGroupsAsync(response);
+      console.log('GROUPS: '+JSON.stringify(groups));
       groups = groups.entries;
       groups.forEach(function (item) {
         console.log('joining room: ' + item.PartitionKey._);
@@ -107,6 +108,25 @@ io.on('connection', function (socket) {
       io.to(data.groupId).emit('receivedMessage', data);
 
     }catch(ex) {
+      error = ex;
+    }
+    callback(error, response);
+  });
+
+  socket.on('getGroups', async(nullValue, callback) => { // data should contain the groupId
+    var error = null;
+    var response = null;
+    console.log('am primit get groups de la client. ');
+    try{
+
+      var data = {};
+      data.userId = connectedUsers[socket.id].userId;
+
+      response = await handler.getGroupsAsync(data);
+      response = response.entries;
+      console.log('111111111119900 '+JSON.stringify(response));
+    }
+    catch(ex) {
       error = ex;
     }
     callback(error, response);
