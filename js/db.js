@@ -168,7 +168,7 @@ async function addGroupMessageAsync(userId, groupId, message, messageType) {
             if (!error) {
                 // Entity inserted
                 console.log(`group message inserted, awesome! result: ${ JSON.stringify(result) } \n response ${ JSON.stringify(response) }`);
-                resolve(response);
+                resolve(newGroupMessage);
             } else {
                 reject(error);
             }

@@ -105,7 +105,7 @@ io.on('connection', function (socket) {
       var response = await handler.addGroupMessageAsync(data);
       console.log("---> OK response -- "+ JSON.stringify(response));
       //send message to room
-      io.to(data.groupId).emit('receivedMessage', data);
+      io.to(data.groupId).emit('receivedMessage', response);
 
     }catch(ex) {
       error = ex;
