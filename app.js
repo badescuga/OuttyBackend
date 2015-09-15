@@ -46,7 +46,7 @@ io.on('connection', function (socket) {
 
       // subscribing user to rooms(groups)
       var groups = await handler.getGroupsAsync(response);
-      console.log('GROUPS: '+JSON.stringify(groups));
+      console.log('GROUPS: ' + JSON.stringify(groups));
       groups = groups.entries;
       groups.forEach(function (item) {
         console.log('joining room: ' + item.PartitionKey._);
@@ -96,19 +96,20 @@ io.on('connection', function (socket) {
     callback(error, response);
   });
 
-  socket.on('addGroupMessage', async(data, callback) => { // data should contain the groupId,message,messageType
+  socket.on('sendMessage', async(data, callback) => { // data should contain the groupId,message,messageType
     var error = null;
     var response = null;
-    console.log('am primit join group de la client. ' + JSON.stringify(data));
+    console.log('am primit send message de la client. ' + JSON.stringify(data));
     try{
       data.userId = connectedUsers[socket.id].userId;
       var response = await handler.addGroupMessageAsync(data);
-
+      console.log("---> OK response -- "+ JSON.stringify(response));
       //send message to room
       io.to(data.groupId).emit('receivedMessage', data);
 
     }catch(ex) {
       error = ex;
+      console.error('error on send message ' + JSON.stringify(ex));
     }
     callback(error, response);
   });
@@ -124,7 +125,7 @@ io.on('connection', function (socket) {
 
       response = await handler.getGroupsAsync(data);
       response = response.entries;
-      console.log('111111111119900 '+JSON.stringify(response));
+      console.log('111111111119900 ' + JSON.stringify(response));
     }
     catch(ex) {
       error = ex;
@@ -138,7 +139,7 @@ io.on('connection', function (socket) {
     console.log('am primit get group messages de la client. ' + JSON.stringify(data));
     try{
       response = await handler.getGroupMessagesAsync(data);
-      console.log('1111111111133333 '+JSON.stringify(response));
+      console.log('1111111111133333 ' + JSON.stringify(response));
     }
     catch(ex) {
       error = ex;

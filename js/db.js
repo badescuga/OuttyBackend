@@ -155,13 +155,13 @@ async function getGroupsAsync(userId) { // doesn't return the name of the group
 async function addGroupMessageAsync(userId, groupId, message, messageType) {
 
     var newGroupMessage = {
-        PartitionKey: groupId,
+        PartitionKey: entityGen.String(groupId),
         RowKey: entityGen.String(guid.generate()),
         userId: entityGen.String(userId),
         message: entityGen.String(message),
         messageType: entityGen.String(messageType)
     };
-
+   // console.log('YO');
     return new Promise(function (resolve, reject) {
         //inserting new group
         tableService.insertEntity(GROUPS_MESSAGES_TABLE_NAME, newGroupMessage, function (error, result, response) {
@@ -183,7 +183,7 @@ async function getGroupMessagesAsync(groupId) {
 
     return new Promise(function (resolve, reject) {
         //get groups for a certain user
-        tableService.queryEntities(GROUPS_MEMBERS_TABLE_NAME, query, null, function (error, result, response) {
+        tableService.queryEntities(GROUPS_MESSAGES_TABLE_NAME, query, null, function (error, result, response) {
             if (!error) {
                 // query succesful
                 console.log(`get group messages query succesful, awesome! result: ${ JSON.stringify(result) } \n response ${ JSON.stringify(response) }`);
