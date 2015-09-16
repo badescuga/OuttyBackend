@@ -65,53 +65,62 @@ async function getUsersInfoFromChatsAsync(data) { // userId
 		var groupsIds = null;
 		var groupsIdsFormatted = [];
 
-		console.log(`\n\n 0 =================> `);
+		//console.log(`\n\n 0 =================> `);
 
 		//first, get all the user's groups
 		groupsIds = await db.getGroupsIdsAsync(data.userId);
 		groupsIds.entries.forEach((item) => {
 			groupsIdsFormatted.push(item.PartitionKey._);
 		});
-		console.log(`\n\n 1 =================> ${JSON.stringify(groupsIdsFormatted) }`);
+
+		//console.log(`\n\n 1 =================> ${JSON.stringify(groupsIdsFormatted) }`);
 
 		//now, get all the ids for the users in these groups
 
 
 		var usersIdsFormatted = {};
 
-		for (var index = 0; index < groupsIdsFormatted.length; index++) {
-			var element = groupsIdsFormatted[index];
-			var usersIds = await db.getGroupUsersIdsAsync(element);
-			usersIds.entries.forEach(function (element2) {
-				usersIdsFormatted[element2.RowKey._] = "-";
-			}, this);
-		}
+		await Promise.all(groupsIdsFormatted.map((element) => {
+			return db.getGroupUsersIdsAsync(element).then(function (usersIds) {
+				usersIds.entries.forEach(function (element2) {
+					usersIdsFormatted[element2.RowKey._] = "-";
+				}, this);
+			});
 
-		console.log(`\n\n 2 ==================> ${JSON.stringify(usersIdsFormatted) }`);
+		}));
+
+
+		//console.log(`\n\n 2 ==================> ${JSON.stringify(usersIdsFormatted) }`);
 
 		//now get all the complete info about each user
 		var usersCompleteData = [];
+		var usersIdsFormattedArray = [];
 
-
+		//translating keys to array
 		for (var key in usersIdsFormatted) {
-
-			var userData = await db.getUserInfoAsync(key);
-			if (userData.entries.length > 0) {
-				console.log('\n\n -- ' + JSON.stringify(userData.entries[0]));
-				usersCompleteData.push(userData.entries[0]);
-			}
+			usersIdsFormattedArray.push(key);
 		}
 
-		console.log(`\n\n 3 ==================> ${JSON.stringify(usersCompleteData) }`);
+		await Promise.all(usersIdsFormattedArray.map((element) => {
+			return db.getUserInfoAsync(element).then(function (userData) {
+				if (userData.entries.length > 0) {
+					usersCompleteData.push(userData.entries[0]);
+				}
+			}, this);
+		}));
+
+		//console.log(`\n\n 3 ==================> ${JSON.stringify(usersCompleteData) }`);
 
 		return usersCompleteData;
 
 	}
 	catch (error) {
-		console.log(`error in getUsersInfoFromChatAsync ${error}`);
+		console.error(`error in getUsersInfoFromChatAsync ${error}`);
 		throw error;
 	}
 }
+
+
 
 module.exports = {
 	loginUserAsync: loginUserAsync,
