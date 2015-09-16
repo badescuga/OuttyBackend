@@ -130,7 +130,7 @@ async function addUserToGroupAsync(groupId, userId) {
     });
 };
 
-async function getGroupsAsync(userId) { // doesn't return the name of the group
+async function getGroupsIdsAsync(userId) { // !!!! this doesn't return the name of the group
 
     var query = new azure.TableQuery()
     //.top(5);
@@ -145,12 +145,55 @@ async function getGroupsAsync(userId) { // doesn't return the name of the group
                 resolve(result);
             } else {
                 console.log(`get groups query failed: ${error}`);
-                // reject(error);
+                reject(error);
             }
         });
     });
 
 };
+
+async function getGroupUsersIdsAsync(groupId) { // !!!! this doesn't return data about the users
+
+    var query = new azure.TableQuery()
+    //.top(5);
+        .where('PartitionKey eq ?', groupId);
+
+    return new Promise(function (resolve, reject) {
+        //get groups for a certain user
+        tableService.queryEntities(GROUPS_MEMBERS_TABLE_NAME, query, null, function (error, result, response) {
+            if (!error) {
+                // query succesful
+                console.log(`get group users query succesful, awesome! result: ${ JSON.stringify(result) } \n response ${ JSON.stringify(response) }`);
+                resolve(result);
+            } else {
+                console.log(`get group users query failed: ${error}`);
+                reject(error);
+            }
+        });
+    });
+
+};
+
+async function getUserInfoAsync(userId) {
+    var query = new azure.TableQuery()
+        .top(1)
+        .where('RowKey eq ?', userId);
+
+    return new Promise(function (resolve, reject) {
+        //get groups for a certain user
+        tableService.queryEntities(USERS_TABLE_NAME, query, null, function (error, result, response) {
+            if (!error) {
+                // query succesful
+                console.log(`get user info query succesful, awesome! result: ${ JSON.stringify(result) } \n response ${ JSON.stringify(response) }`);
+                resolve(result);
+            } else {
+                console.log(`get user info query failed: ${error}`);
+                reject(error);
+            }
+        });
+    });
+};
+
 
 async function addGroupMessageAsync(userId, groupId, message, messageType) {
 
@@ -161,7 +204,7 @@ async function addGroupMessageAsync(userId, groupId, message, messageType) {
         message: entityGen.String(message),
         messageType: entityGen.String(messageType)
     };
-   // console.log('YO');
+    // console.log('YO');
     return new Promise(function (resolve, reject) {
         //inserting new group
         tableService.insertEntity(GROUPS_MESSAGES_TABLE_NAME, newGroupMessage, function (error, result, response) {
@@ -207,8 +250,10 @@ function clone(jsObj) {
 module.exports = {
     loginUserAsync: loginUserAsync,
     createGroupAsync: createGroupAsync,
-    getGroupsAsync: getGroupsAsync,
+    getGroupsIdsAsync: getGroupsIdsAsync,
     getGroupMessagesAsync: getGroupMessagesAsync,
     addUserToGroupAsync: addUserToGroupAsync,
-    addGroupMessageAsync: addGroupMessageAsync
+    addGroupMessageAsync: addGroupMessageAsync,
+    getGroupUsersIdsAsync: getGroupUsersIdsAsync,
+    getUserInfoAsync: getUserInfoAsync
 };

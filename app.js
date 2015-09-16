@@ -45,7 +45,7 @@ io.on('connection', function (socket) {
       console.log('received response from login: ' + JSON.stringify(response));
 
       // subscribing user to rooms(groups)
-      var groups = await handler.getGroupsAsync(response);
+      var groups = await handler.getGroupsIdsAsync(response);
       console.log('GROUPS: ' + JSON.stringify(groups));
       groups = groups.entries;
       groups.forEach(function (item) {
@@ -103,7 +103,7 @@ io.on('connection', function (socket) {
     try{
       data.userId = connectedUsers[socket.id].userId;
       var response = await handler.addGroupMessageAsync(data);
-      console.log("---> OK response -- "+ JSON.stringify(response));
+      console.log("---> OK response -- " + JSON.stringify(response));
       //send message to room
       io.to(data.groupId).emit('receivedMessage', response);
 
@@ -123,13 +123,32 @@ io.on('connection', function (socket) {
       var data = {};
       data.userId = connectedUsers[socket.id].userId;
 
-      response = await handler.getGroupsAsync(data);
+      response = await handler.getGroupsIdsAsync(data);
       response = response.entries;
       console.log('111111111119900 ' + JSON.stringify(response));
     }
     catch(ex) {
       error = ex;
     }
+    callback(error, response);
+  });
+
+  socket.on('getUsersInfoFromChats', async(data, callback) => { // data should contain the groupId
+    var error = null;
+    var response = null;
+
+    var data = {};
+    data.userId = connectedUsers[socket.id].userId;
+
+    console.log('>>>>>>>>>>>>>>>>>>>>>> am primit get users info from chats de la client. ' + JSON.stringify(data));
+    try{
+      response = await handler.getUsersInfoFromChatsAsync(data);
+      console.log('6666613333389898 ' + JSON.stringify(response));
+    }
+    catch(ex) {
+      error = ex;
+    }
+
     callback(error, response);
   });
 

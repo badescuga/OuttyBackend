@@ -1,6 +1,7 @@
 //var db = require('./db.js');
 import * as  db from './db'
 import * as  GUID from './GUID.js'
+import * as _ from 'underscore'
 //import * as  testAsync from './testStorageAsync'
 
 async function loginUserAsync(data) {
@@ -24,9 +25,9 @@ async function createGroupAsync(data) {
 	}
 };
 
-async function getGroupsAsync(data) {
+async function getGroupsIdsAsync(data) {
 	try {
-		return await db.getGroupsAsync(data.userId);
+		return await db.getGroupsIdsAsync(data.userId);
 	} catch (error) {
 		throw error;
 	}
@@ -58,12 +59,66 @@ async function addGroupMessageAsync(data) {
 	}
 }
 
+async function getUsersInfoFromChatsAsync(data) { // userId
+
+	try {
+		var groupsIds = null;
+		var groupsIdsFormatted = [];
+
+		console.log(`\n\n 0 =================> `);
+
+		//first, get all the user's groups
+		groupsIds = await db.getGroupsIdsAsync(data.userId);
+		groupsIds.entries.forEach((item) => {
+			groupsIdsFormatted.push(item.PartitionKey._);
+		});
+		console.log(`\n\n 1 =================> ${JSON.stringify(groupsIdsFormatted) }`);
+
+		//now, get all the ids for the users in these groups
+
+
+		var usersIdsFormatted = {};
+
+		for (var index = 0; index < groupsIdsFormatted.length; index++) {
+			var element = groupsIdsFormatted[index];
+			var usersIds = await db.getGroupUsersIdsAsync(element);
+			usersIds.entries.forEach(function (element2) {
+				usersIdsFormatted[element2.RowKey._] = "-";
+			}, this);
+		}
+
+		console.log(`\n\n 2 ==================> ${JSON.stringify(usersIdsFormatted) }`);
+
+		//now get all the complete info about each user
+		var usersCompleteData = [];
+
+
+		for (var key in usersIdsFormatted) {
+
+			var userData = await db.getUserInfoAsync(key);
+			if (userData.entries.length > 0) {
+				console.log('\n\n -- ' + JSON.stringify(userData.entries[0]));
+				usersCompleteData.push(userData.entries[0]);
+			}
+		}
+
+		console.log(`\n\n 3 ==================> ${JSON.stringify(usersCompleteData) }`);
+
+		return usersCompleteData;
+
+	}
+	catch (error) {
+		console.log(`error in getUsersInfoFromChatAsync ${error}`);
+		throw error;
+	}
+}
 
 module.exports = {
 	loginUserAsync: loginUserAsync,
 	createGroupAsync: createGroupAsync,
-	getGroupsAsync: getGroupsAsync,
+	getGroupsIdsAsync: getGroupsIdsAsync,
 	getGroupMessagesAsync: getGroupMessagesAsync,
 	addUserToGroupAsync: addUserToGroupAsync,
-	addGroupMessageAsync: addGroupMessageAsync
+	addGroupMessageAsync: addGroupMessageAsync,
+	getUsersInfoFromChatsAsync: getUsersInfoFromChatsAsync
 };
