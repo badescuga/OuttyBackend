@@ -17,7 +17,6 @@ async function createGroupAsync(data) {
 		var userId = data.userId;
 		var result = await db.createGroupAsync(data.name);
 		await db.addUserToGroupAsync(result.groupId, userId);
-
 		return result;
 
 	} catch (error) {

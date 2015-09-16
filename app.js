@@ -25,12 +25,6 @@ var connectedUsers = {};
 var numUsers = 0;
 
 io.on('connection', function (socket) {
-  var addedUser = false;
-
-  // socket.on('init', function (data) {
-  //   console.log('am primit init de la client.');
-  //   socket.emit('init', {});
-  // });
 
   socket.on('login', async(data, callback) => {
     var error = null;
@@ -120,10 +114,7 @@ io.on('connection', function (socket) {
     console.log('am primit get groups de la client. ');
     try{
 
-      var data = {};
-      data.userId = connectedUsers[socket.id].userId;
-
-      response = await handler.getGroupsIdsAsync(data);
+      response = await handler.getGroupsIdsAsync({ userId: connectedUsers[socket.id].userId });
       response = response.entries;
       console.log('111111111119900 ' + JSON.stringify(response));
     }
@@ -137,12 +128,9 @@ io.on('connection', function (socket) {
     var error = null;
     var response = null;
 
-    var data = {};
-    data.userId = connectedUsers[socket.id].userId;
-
     console.log('>>>>>>>>>>>>>>>>>>>>>> am primit get users info from chats de la client. ' + JSON.stringify(data));
     try{
-      response = await handler.getUsersInfoFromChatsAsync(data);
+      response = await handler.getUsersInfoFromChatsAsync({ userId: connectedUsers[socket.id].userId });
       console.log('6666613333389898 ' + JSON.stringify(response));
     }
     catch(ex) {
@@ -172,70 +160,4 @@ io.on('connection', function (socket) {
     delete connectedUsers[socket.id];
   });
 
-
-
-
-
-
-
-
-
-
-
-  ////////////////////////test data
-  // when the client emits 'new message', this listens and executes
-  socket.on('new message', function (data) {
-    // we tell the client to execute 'new message'
-    socket.broadcast.emit('new message', {
-      username: socket.username,
-      message: data
-    });
-  });
-
-  // when the client emits 'add user', this listens and executes
-  socket.on('add user', function (username) {
-    // we store the username in the socket session for this client
-    socket.username = username;
-    // add the client's username to the global list
-    usernames[username] = username;
-    ++numUsers;
-    addedUser = true;
-    socket.emit('login', {
-      numUsers: numUsers
-    });
-    // echo globally (all clients) that a person has connected
-    socket.broadcast.emit('user joined', {
-      username: socket.username,
-      numUsers: numUsers
-    });
-  });
-
-  // when the client emits 'typing', we broadcast it to others
-  socket.on('typing', function () {
-    socket.broadcast.emit('typing', {
-      username: socket.username
-    });
-  });
-
-  // when the client emits 'stop typing', we broadcast it to others
-  socket.on('stop typing', function () {
-    socket.broadcast.emit('stop typing', {
-      username: socket.username
-    });
-  });
-
-  // when the user disconnects.. perform this
-  socket.on('disconnect', function () {
-    // remove the username from global usernames list
-    if (addedUser) {
-      delete usernames[socket.username];
-      --numUsers;
-
-      // echo globally that this client has left
-      socket.broadcast.emit('user left', {
-        username: socket.username,
-        numUsers: numUsers
-      });
-    }
-  });
 });
