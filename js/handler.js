@@ -92,7 +92,7 @@ async function getUsersInfoFromChatsAsync(data) { // userId
 		//console.log(`\n\n 2 ==================> ${JSON.stringify(usersIdsFormatted) }`);
 
 		//now get all the complete info about each user
-		var usersCompleteData = [];
+		var usersCompleteData = {};
 		var usersIdsFormattedArray = [];
 
 		//translating keys to array
@@ -102,8 +102,12 @@ async function getUsersInfoFromChatsAsync(data) { // userId
 
 		await Promise.all(usersIdsFormattedArray.map((element) => {
 			return db.getUserInfoAsync(element).then(function (userData) {
+
 				if (userData.entries.length > 0) {
-					usersCompleteData.push(userData.entries[0]);
+					var ud = userData.entries[0];
+					var str = ud.RowKey._;
+					//	console.log('\n\n '+ JSON.stringify(str) +'\n\n');
+					usersCompleteData[str] = ud;
 				}
 			}, this);
 		}));
