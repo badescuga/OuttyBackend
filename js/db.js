@@ -130,6 +130,29 @@ async function addUserToGroupAsync(groupId, userId) {
     });
 };
 
+async function removeUserFromGroupAsync(groupId, userId) {
+
+    console.log('daaaa 000asd ');
+    var groupUserObj = {
+        PartitionKey: entityGen.String(groupId),
+        RowKey: entityGen.String(userId)
+    };
+    return new Promise(function (resolve, reject) {
+        console.log(`${JSON.stringify(groupUserObj) }`);
+        //inserting new group
+        tableService.deleteEntity(GROUPS_MEMBERS_TABLE_NAME, groupUserObj, function (error, response) {
+            if (!error) {
+                // Entity inserted
+                console.log(`group user deleted, awesome! response ${ JSON.stringify(response) }`);
+                resolve(response);
+            } else {
+                console.log(`${JSON.stringify(error) }`);
+                reject(error);
+            }
+        });
+    });
+};
+
 async function getGroupsIdsAsync(userId) { // !!!! this doesn't return the name of the group
 
     var query = new azure.TableQuery()
@@ -255,5 +278,6 @@ module.exports = {
     addUserToGroupAsync: addUserToGroupAsync,
     addGroupMessageAsync: addGroupMessageAsync,
     getGroupUsersIdsAsync: getGroupUsersIdsAsync,
-    getUserInfoAsync: getUserInfoAsync
+    getUserInfoAsync: getUserInfoAsync,
+    removeUserFromGroupAsync: removeUserFromGroupAsync
 };

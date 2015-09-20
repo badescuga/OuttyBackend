@@ -49,6 +49,16 @@ async function addUserToGroupAsync(data) {
 	}
 }
 
+async function removeUserFromGroupAsync(data) {
+	try {
+		console.log('test io!');
+		return await db.removeUserFromGroupAsync(data.groupId, data.userId);
+	} catch(error) {
+		throw error;
+	}
+	
+}
+
 async function addGroupMessageAsync(data) {
 	try {
 		return await db.addGroupMessageAsync(data.userId, data.groupId, data.message, data.messageType);
@@ -87,7 +97,6 @@ async function getUsersInfoFromChatsAsync(data) { // userId
 			});
 
 		}));
-
 
 		//console.log(`\n\n 2 ==================> ${JSON.stringify(usersIdsFormatted) }`);
 
@@ -132,5 +141,6 @@ module.exports = {
 	getGroupMessagesAsync: getGroupMessagesAsync,
 	addUserToGroupAsync: addUserToGroupAsync,
 	addGroupMessageAsync: addGroupMessageAsync,
-	getUsersInfoFromChatsAsync: getUsersInfoFromChatsAsync
+	getUsersInfoFromChatsAsync: getUsersInfoFromChatsAsync,
+	removeUserFromGroupAsync:removeUserFromGroupAsync
 };

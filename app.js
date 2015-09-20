@@ -58,6 +58,7 @@ io.on('connection', function (socket) {
   socket.on('createGroup', async(data, callback) => { // data should contain only the name of the group
     var error = null;
     var response = null;
+    console.log('\n\n user socket id : '+ socket.id);
     console.log('am primit create group de la client. ' + JSON.stringify(data));
     try {
       data.userId = connectedUsers[socket.id].userId;
@@ -78,6 +79,7 @@ io.on('connection', function (socket) {
     console.log('am primit join group de la client. ' + JSON.stringify(data));
     try{
       data.userId = connectedUsers[socket.id].userId;
+      console.log('\n\n my user id is : ' + data.userId +" my socket ID is : "+socket.id+" \n\n");
       response = await handler.addUserToGroupAsync(data);
       console.log('responding to client with: ' + JSON.stringify(response));
 
@@ -89,7 +91,27 @@ io.on('connection', function (socket) {
     }
     callback(error, response);
   });
+  
+  socket.on('removeUserFromGroup', async(data, callback) => { // data should contain only the groupId
+    var error = null;
+    var response = null;
+    console.log('am primit remove user from group de la client. ' + JSON.stringify(data));
+    try{
+      data.userId = connectedUsers[socket.id].userId;
+      console.log('daaa --- '+JSON.stringify(data));
+      response = await handler.removeUserFromGroupAsync(data);
+      console.log('responding to client with: ' + JSON.stringify(response));
 
+      //unsubscribe to the chat
+      socket.leave(data.groupId);
+
+    }catch(ex) {
+      error = ex;
+    }
+    callback(error, response);
+  });
+  
+  
   socket.on('sendMessage', async(data, callback) => { // data should contain the groupId,message,messageType
     var error = null;
     var response = null;
