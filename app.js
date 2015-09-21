@@ -91,7 +91,7 @@ io.on('connection', function (socket) {
     }
     callback(error, response);
   });
-  
+
   socket.on('removeUserFromGroup', async(data, callback) => { // data should contain only the groupId
     var error = null;
     var response = null;
@@ -110,8 +110,8 @@ io.on('connection', function (socket) {
     }
     callback(error, response);
   });
-  
-  
+
+
   socket.on('sendMessage', async(data, callback) => { // data should contain the groupId,message,messageType
     var error = null;
     var response = null;
@@ -146,13 +146,13 @@ io.on('connection', function (socket) {
     callback(error, response);
   });
 
-  socket.on('getUsersInfoFromChats', async(data, callback) => { // data should contain the groupId
+  socket.on('getInitData', async(data, callback) => { // data should contain the groupId
     var error = null;
     var response = null;
 
     console.log('>>>>>>>>>>>>>>>>>>>>>> am primit get users info from chats de la client. ' + JSON.stringify(data));
     try{
-      response = await handler.getUsersInfoFromChatsAsync({ userId: connectedUsers[socket.id].userId });
+      response = await handler.getInitDataAsync({ userId: connectedUsers[socket.id].userId });
       console.log('6666613333389898 ' + JSON.stringify(response));
     }
     catch(ex) {

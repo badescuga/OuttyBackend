@@ -56,7 +56,7 @@ async function removeUserFromGroupAsync(data) {
 	} catch(error) {
 		throw error;
 	}
-	
+
 }
 
 async function addGroupMessageAsync(data) {
@@ -68,11 +68,20 @@ async function addGroupMessageAsync(data) {
 	}
 }
 
-async function getUsersInfoFromChatsAsync(data) { // userId
+//gets the data from users that belong to all my chats
+async function getInitDataAsync(data) { // userId
+
 
 	try {
 		var groupsIds = null;
 		var groupsIdsFormatted = [];
+
+		//for each group, the name and other details
+		var groupsDetailedData = {};
+
+		//for each group, the members of it
+		var groupsUsers = {};
+
 
 		//console.log(`\n\n 0 =================> `);
 
@@ -82,15 +91,22 @@ async function getUsersInfoFromChatsAsync(data) { // userId
 			groupsIdsFormatted.push(item.PartitionKey._);
 		});
 
+		//now get all the info for each group (group name etc)
+		await Promise.all(groupsIdsFormatted.map((element) => {
+			return db.getGroupInfoAsync(element).then(function (groupInfo) {
+				groupsDetailedData[element] = groupInfo.entries[0];
+			});
+
+		}));
+
 		//console.log(`\n\n 1 =================> ${JSON.stringify(groupsIdsFormatted) }`);
 
 		//now, get all the ids for the users in these groups
-
-
 		var usersIdsFormatted = {};
 
 		await Promise.all(groupsIdsFormatted.map((element) => {
 			return db.getGroupUsersIdsAsync(element).then(function (usersIds) {
+				groupsUsers[element] = usersIds.entries;
 				usersIds.entries.forEach(function (element2) {
 					usersIdsFormatted[element2.RowKey._] = "-";
 				}, this);
@@ -121,9 +137,13 @@ async function getUsersInfoFromChatsAsync(data) { // userId
 			}, this);
 		}));
 
-		//console.log(`\n\n 3 ==================> ${JSON.stringify(usersCompleteData) }`);
+		console.log(`\n\n 3 ==================> ${JSON.stringify(usersCompleteData)} ${JSON.stringify(groupsUsers)} ${JSON.stringify(usersCompleteData)}`);
+		var finalData = {};
+		finalData.usersCompleteData = usersCompleteData;
+		finalData.groupsUsers = groupsUsers;
+		finalData.groupsDetailedData = groupsDetailedData;
 
-		return usersCompleteData;
+		return finalData;
 
 	}
 	catch (error) {
@@ -141,6 +161,6 @@ module.exports = {
 	getGroupMessagesAsync: getGroupMessagesAsync,
 	addUserToGroupAsync: addUserToGroupAsync,
 	addGroupMessageAsync: addGroupMessageAsync,
-	getUsersInfoFromChatsAsync: getUsersInfoFromChatsAsync,
+	getInitDataAsync: getInitDataAsync,
 	removeUserFromGroupAsync:removeUserFromGroupAsync
 };

@@ -175,6 +175,28 @@ async function getGroupsIdsAsync(userId) { // !!!! this doesn't return the name 
 
 };
 
+async function getGroupInfoAsync(groupId) { // !!!! this doesn't return data about the users
+
+    var query = new azure.TableQuery()
+    //.top(5);
+        .where('RowKey eq ?', groupId);
+
+    return new Promise(function (resolve, reject) {
+        //get groups for a certain user
+        tableService.queryEntities(GROUPS_TABLE_NAME, query, null, function (error, result, response) {
+            if (!error) {
+                // query succesful
+                console.log(`get group info query succesful, awesome! result: ${ JSON.stringify(result) } \n response ${ JSON.stringify(response) }`);
+                resolve(result);
+            } else {
+                console.log(`get group info query failed: ${error}`);
+                reject(error);
+            }
+        });
+    });
+
+};
+
 async function getGroupUsersIdsAsync(groupId) { // !!!! this doesn't return data about the users
 
     var query = new azure.TableQuery()
@@ -279,5 +301,6 @@ module.exports = {
     addGroupMessageAsync: addGroupMessageAsync,
     getGroupUsersIdsAsync: getGroupUsersIdsAsync,
     getUserInfoAsync: getUserInfoAsync,
-    removeUserFromGroupAsync: removeUserFromGroupAsync
+    removeUserFromGroupAsync: removeUserFromGroupAsync,
+    getGroupInfoAsync: getGroupInfoAsync
 };
